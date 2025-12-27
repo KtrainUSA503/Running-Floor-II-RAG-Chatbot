@@ -7,6 +7,7 @@ Built for Keith Manufacturing Company
 
 import streamlit as st
 import openai
+import base64
 from pinecone import Pinecone
 from typing import List, Tuple
 
@@ -23,6 +24,11 @@ from pathlib import Path
 def load_css(path: str) -> None:
     css = Path(path).read_text(encoding="utf-8")
     st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+
+@st.cache_data(show_spinner=False)
+def load_image_base64(path: str) -> str:
+    """Load an image file and return a base64-encoded string (for inline HTML <img>)."""
+    return base64.b64encode(Path(path).read_bytes()).decode("utf-8")
 
 load_css("brand/tokens.css")
 
@@ -75,6 +81,18 @@ st.markdown("""
         border-radius: 10px;
         margin-bottom: 20px;
         box-shadow: var(--keith-shadow);
+    }
+    .main-header .header-inner {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    .main-header .keith-logo {
+        height: 52px;
+        width: auto;
+        background: rgba(255,255,255,0.95);
+        border-radius: 10px;
+        padding: 8px;
     }
     .main-header h1 {
         color: white;
@@ -279,16 +297,22 @@ Please provide a helpful, accurate response based on the manual content."""
 
 def main():
     # Header
-    st.markdown("""
+    logo_b64 = load_image_base64("assets/keith-logo.png")
+    st.markdown(f"""
     <div class="main-header">
-        <h1>🔧 Running Floor II Installation Assistant</h1>
-        <p>AI-powered support for KEITH Walking Floor® system installation</p>
+        <div class="header-inner">
+            <img class="keith-logo" src="data:image/png;base64,{logo_b64}" alt="KEITH Logo" />
+            <div>
+                <h1>Running Floor II Installation Assistant</h1>
+                <p>AI-powered support for KEITH Walking Floor® system installation</p>
+            </div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
     
     # Sidebar
     with st.sidebar:
-        st.image("https://www.keithwalkingfloor.com/wp-content/themes/theme/images/logo.png", width=200)
+        st.image("assets/keith-logo.png", width=200)
         st.markdown("---")
         st.markdown("### About")
         st.markdown("""
