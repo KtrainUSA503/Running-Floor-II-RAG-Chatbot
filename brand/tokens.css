@@ -1,0 +1,15 @@
+:root {
+    --keith-navy: #00395D;
+    --keith-blue: #0077B6;
+    --keith-red: #8B1D18;
+  
+    --keith-text: #2E2E2E;
+    --keith-muted: #5F6B73;
+    --keith-bg: #FFFFFF;
+    --keith-border: #E5E7EB;
+  
+    --keith-font: "Lato", Helvetica, Arial, sans-serif;
+  
+    --keith-radius-pill: 9999px;
+  }
+  
