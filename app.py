@@ -172,13 +172,42 @@ st.markdown("""
         border-color: var(--keith-blue);
     }
 
-    /* Chat input */
+    /* Chat input (fix Streamlit's default dark "footer" look) */
+    [data-testid="stChatInput"] {
+        background: transparent;
+    }
+    /* The fixed bottom container */
+    [data-testid="stChatInput"] > div {
+        background: var(--keith-bg);
+        border-top: 1px solid var(--keith-border);
+        box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.08);
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
     [data-testid="stChatInput"] textarea {
+        background: var(--keith-bg);
+        color: var(--keith-text);
         border-radius: 14px;
         border: 1px solid var(--keith-border);
     }
+    [data-testid="stChatInput"] textarea::placeholder {
+        color: var(--keith-muted);
+        opacity: 1;
+    }
     [data-testid="stChatInput"] textarea:focus {
         box-shadow: 0 0 0 4px var(--keith-focus);
+        border-color: var(--keith-blue);
+    }
+    /* Send button */
+    [data-testid="stChatInput"] button {
+        border-radius: var(--keith-radius-pill);
+        border: 1px solid var(--keith-border);
+        background: var(--keith-navy);
+        color: white;
+    }
+    [data-testid="stChatInput"] button:hover {
+        background: var(--keith-blue);
+        border-color: var(--keith-blue);
     }
 </style>
 """, unsafe_allow_html=True)
