@@ -7,6 +7,12 @@
     --keith-muted: #5F6B73;
     --keith-bg: #FFFFFF;
     --keith-border: #E5E7EB;
+
+    /* UI surfaces */
+    --keith-surface: #F7FAFC;
+    --keith-surface-2: #F3F8FB;
+    --keith-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    --keith-focus: rgba(0, 119, 182, 0.35);
   
     --keith-font: "Lato", Helvetica, Arial, sans-serif;
   

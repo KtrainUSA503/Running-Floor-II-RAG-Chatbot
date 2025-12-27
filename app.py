@@ -40,9 +40,32 @@ st.markdown("""
         color: var(--keith-text);
     }
 
-    /* App background */
+    /* App + page layout */
     .stApp {
-        background-color: var(--keith-bg);
+        background-color: var(--keith-surface);
+    }
+    .main .block-container {
+        max-width: 1120px;
+        padding-top: 1.5rem;
+        padding-bottom: 2rem;
+    }
+    .main h1, .main h2, .main h3 {
+        color: var(--keith-navy);
+        letter-spacing: -0.01em;
+    }
+
+    /* Sidebar (override Streamlit theme so it matches) */
+    [data-testid="stSidebar"] > div:first-child {
+        background: var(--keith-bg);
+        border-right: 1px solid var(--keith-border);
+    }
+    [data-testid="stSidebar"] h3 {
+        color: var(--keith-navy);
+    }
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] li,
+    [data-testid="stSidebar"] span {
+        color: var(--keith-text);
     }
 
     /* Header */
@@ -51,6 +74,7 @@ st.markdown("""
         padding: 20px;
         border-radius: 10px;
         margin-bottom: 20px;
+        box-shadow: var(--keith-shadow);
     }
     .main-header h1 {
         color: white;
@@ -72,7 +96,7 @@ st.markdown("""
 
     /* Sources */
     .source-box {
-        background-color: #F3F8FB;
+        background-color: var(--keith-surface-2);
         padding: 10px;
         border-radius: 6px;
         border-left: 4px solid var(--keith-navy);
@@ -87,7 +111,7 @@ st.markdown("""
         margin: 10px 0;
     }
     .user-message {
-        background-color: #EEF6FF;
+        background-color: var(--keith-surface-2);
         border: 1px solid var(--keith-border);
     }
     .assistant-message {
@@ -101,6 +125,42 @@ st.markdown("""
         padding: 10px 18px;
         font-weight: 600;
         border: 1px solid var(--keith-border);
+        transition: background-color 120ms ease, border-color 120ms ease, transform 80ms ease;
+    }
+    .stButton > button:active {
+        transform: translateY(1px);
+    }
+    /* Primary buttons */
+    .stButton > button[kind="primary"] {
+        background: var(--keith-navy);
+        color: white;
+        border-color: var(--keith-navy);
+    }
+    .stButton > button[kind="primary"]:hover {
+        background: var(--keith-blue);
+        border-color: var(--keith-blue);
+    }
+    .stButton > button[kind="primary"]:focus {
+        box-shadow: 0 0 0 4px var(--keith-focus);
+    }
+    /* Secondary buttons (use for example question “chips”) */
+    .stButton > button[kind="secondary"] {
+        background: var(--keith-bg);
+        color: var(--keith-navy);
+        border-color: var(--keith-border);
+    }
+    .stButton > button[kind="secondary"]:hover {
+        background: var(--keith-surface-2);
+        border-color: var(--keith-blue);
+    }
+
+    /* Chat input */
+    [data-testid="stChatInput"] textarea {
+        border-radius: 14px;
+        border: 1px solid var(--keith-border);
+    }
+    [data-testid="stChatInput"] textarea:focus {
+        box-shadow: 0 0 0 4px var(--keith-focus);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -252,7 +312,7 @@ def main():
         """)
         
         st.markdown("---")
-        if st.button("🗑️ Clear Chat History"):
+        if st.button("🗑️ Clear Chat History", type="secondary"):
             st.session_state.messages = []
             st.rerun()
     
@@ -342,7 +402,7 @@ def show_example_questions():
     cols = st.columns(2)
     for i, example in enumerate(examples):
         with cols[i % 2]:
-            if st.button(f"❓ {example}", key=f"example_{i}"):
+            if st.button(f"❓ {example}", key=f"example_{i}", type="secondary"):
                 st.session_state.example_question = example
 
 if __name__ == "__main__":
