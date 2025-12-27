@@ -40,6 +40,11 @@ st.markdown("""
 # Custom CSS for Keith Manufacturing branding (token-based)
 st.markdown("""
 <style>
+    /* Force light rendering (helps when Chrome/OS/flags try to darken form controls) */
+    :root, html, body {
+        color-scheme: light;
+    }
+
     /* Global typography */
     html, body, [class*="css"] {
         font-family: var(--keith-font);
@@ -49,6 +54,12 @@ st.markdown("""
     /* App + page layout */
     .stApp {
         background-color: var(--keith-surface);
+    }
+    /* Streamlit containers (Chrome can keep dark backgrounds if theme/flags interfere) */
+    [data-testid="stAppViewContainer"],
+    [data-testid="stMain"],
+    section.main {
+        background: var(--keith-surface) !important;
     }
     .main .block-container {
         max-width: 1120px;
