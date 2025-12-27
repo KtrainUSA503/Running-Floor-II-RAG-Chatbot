@@ -216,8 +216,13 @@ st.markdown("""
     [data-testid="stChatInput"] textarea {
         background: var(--keith-bg) !important;
         color: var(--keith-text) !important;
+        -webkit-text-fill-color: var(--keith-text) !important; /* Chrome/Safari */
+        caret-color: var(--keith-navy) !important;
         border-radius: 14px !important;
         border: 1px solid var(--keith-border) !important;
+    }
+    [data-testid="stChatInput"] textarea::selection {
+        background: rgba(0, 119, 182, 0.22) !important;
     }
     [data-testid="stChatInput"] textarea::placeholder {
         color: var(--keith-muted) !important;
