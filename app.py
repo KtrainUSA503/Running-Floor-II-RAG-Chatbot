@@ -17,14 +17,37 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS for Keith Manufacturing branding
+# Load Keith brand tokens
+from pathlib import Path
+
+def load_css(path: str) -> None:
+    css = Path(path).read_text(encoding="utf-8")
+    st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+
+load_css("brand/tokens.css")
+
+# Optional: load Lato from Google Fonts (Streamlit doesn't ship it by default)
+st.markdown("""
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;500;600;700&display=swap">
+""", unsafe_allow_html=True)
+
+# Custom CSS for Keith Manufacturing branding (token-based)
 st.markdown("""
 <style>
-    .stApp {
-        background-color: #f5f5f5;
+    /* Global typography */
+    html, body, [class*="css"] {
+        font-family: var(--keith-font);
+        color: var(--keith-text);
     }
+
+    /* App background */
+    .stApp {
+        background-color: var(--keith-bg);
+    }
+
+    /* Header */
     .main-header {
-        background: linear-gradient(90deg, #1e3a5f 0%, #2d5a87 100%);
+        background: linear-gradient(90deg, var(--keith-navy) 0%, var(--keith-blue) 100%);
         padding: 20px;
         border-radius: 10px;
         margin-bottom: 20px;
@@ -32,30 +55,52 @@ st.markdown("""
     .main-header h1 {
         color: white;
         margin: 0;
+        font-weight: 700;
     }
     .main-header p {
-        color: #ccc;
-        margin: 5px 0 0 0;
+        color: rgba(255,255,255,0.8);
+        margin: 6px 0 0 0;
     }
+
+    /* Links */
+    a, a:visited {
+        color: var(--keith-navy);
+    }
+    a:hover {
+        color: var(--keith-blue);
+    }
+
+    /* Sources */
     .source-box {
-        background-color: #e8f4f8;
+        background-color: #F3F8FB;
         padding: 10px;
-        border-radius: 5px;
-        border-left: 4px solid #1e3a5f;
+        border-radius: 6px;
+        border-left: 4px solid var(--keith-navy);
         margin: 5px 0;
         font-size: 0.9em;
     }
+
+    /* Chat message cards */
     .chat-message {
         padding: 15px;
         border-radius: 10px;
         margin: 10px 0;
     }
     .user-message {
-        background-color: #e3f2fd;
+        background-color: #EEF6FF;
+        border: 1px solid var(--keith-border);
     }
     .assistant-message {
         background-color: white;
-        border: 1px solid #ddd;
+        border: 1px solid var(--keith-border);
+    }
+
+    /* Buttons (Streamlit) */
+    .stButton > button {
+        border-radius: var(--keith-radius-pill);
+        padding: 10px 18px;
+        font-weight: 600;
+        border: 1px solid var(--keith-border);
     }
 </style>
 """, unsafe_allow_html=True)
