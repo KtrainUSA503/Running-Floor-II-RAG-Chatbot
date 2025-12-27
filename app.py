@@ -50,6 +50,14 @@ st.markdown("""
         font-family: var(--keith-font);
         color: var(--keith-text);
     }
+    /* Ensure markdown/chat text is readable even if a browser/extension fights colors */
+    [data-testid="stMarkdownContainer"],
+    [data-testid="stChatMessageContent"],
+    [data-testid="stChatMessageContent"] p,
+    [data-testid="stChatMessageContent"] li,
+    [data-testid="stChatMessageContent"] span {
+        color: var(--keith-text) !important;
+    }
 
     /* App + page layout */
     .stApp {
@@ -261,7 +269,7 @@ def get_embedding(text: str) -> List[float]:
     )
     return response.data[0].embedding
 
-def search_knowledge_base(query: str, index, top_k: int = 5) -> List[dict]:
+def search_knowledge_base(query: str, index, top_k: int = 8) -> List[dict]:
     """Search Pinecone for relevant documents."""
     query_embedding = get_embedding(query)
     
@@ -273,21 +281,36 @@ def search_knowledge_base(query: str, index, top_k: int = 5) -> List[dict]:
     
     return results.matches
 
-def build_context(matches: List[dict]) -> Tuple[str, List[dict]]:
+def build_context(matches: List[dict], min_score: float = 0.35) -> Tuple[str, List[dict]]:
     """Build context string from search results."""
     context_parts = []
     sources = []
     
+    # Include all sufficiently relevant matches
     for match in matches:
-        if match.score > 0.7:  # Only include relevant matches
-            text = match.metadata.get("text", "")
-            page = match.metadata.get("page", "N/A")
+        if (match.score or 0.0) >= min_score:
+            text = (match.metadata or {}).get("text", "") or ""
+            page = (match.metadata or {}).get("page", 0) or 0
             context_parts.append(text)
             sources.append({
                 "text": text[:200] + "..." if len(text) > 200 else text,
-                "page": page + 1,  # Convert to 1-indexed
-                "score": round(match.score, 3)
+                "page": int(page) + 1,  # Convert to 1-indexed
+                "score": round(float(match.score or 0.0), 3)
             })
+
+    # If nothing met the threshold but we have matches, use the best few anyway.
+    if not context_parts and matches:
+        best = sorted(matches, key=lambda m: float(m.score or 0.0), reverse=True)[:3]
+        for match in best:
+            text = (match.metadata or {}).get("text", "") or ""
+            page = (match.metadata or {}).get("page", 0) or 0
+            if text:
+                context_parts.append(text)
+                sources.append({
+                    "text": text[:200] + "..." if len(text) > 200 else text,
+                    "page": int(page) + 1,
+                    "score": round(float(match.score or 0.0), 3)
+                })
     
     return "\n\n".join(context_parts), sources
 
