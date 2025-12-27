@@ -44,6 +44,10 @@ st.markdown("""
     :root, html, body {
         color-scheme: light;
     }
+    /* Windows high-contrast / forced colors can also cause unexpected rendering */
+    :root {
+        forced-color-adjust: none;
+    }
 
     /* Global typography */
     html, body, [class*="css"] {
@@ -67,6 +71,9 @@ st.markdown("""
     [data-testid="stAppViewContainer"],
     [data-testid="stMain"],
     section.main {
+        background: var(--keith-surface) !important;
+    }
+    body {
         background: var(--keith-surface) !important;
     }
     .main .block-container {
@@ -154,6 +161,31 @@ st.markdown("""
     .assistant-message {
         background-color: white;
         border: 1px solid var(--keith-border);
+    }
+
+    /* Streamlit chat message content (Chrome sometimes renders dark containers) */
+    [data-testid="stChatMessageContent"] {
+        background: var(--keith-bg) !important;
+        border: 1px solid var(--keith-border) !important;
+        border-radius: 10px !important;
+        padding: 0.75rem 1rem !important;
+    }
+
+    /* Generic form controls (Chrome/auto-dark can affect inputs outside stChatInput) */
+    input, textarea, select {
+        background: var(--keith-bg) !important;
+        color: var(--keith-text) !important;
+        caret-color: var(--keith-navy) !important;
+        color-scheme: light !important;
+    }
+    /* Chrome autofill yellow/blue backgrounds */
+    input:-webkit-autofill,
+    textarea:-webkit-autofill,
+    select:-webkit-autofill {
+        -webkit-text-fill-color: var(--keith-text) !important;
+        transition: background-color 999999s ease-in-out 0s !important;
+        box-shadow: 0 0 0px 1000px var(--keith-bg) inset !important;
+        caret-color: var(--keith-navy) !important;
     }
 
     /* Buttons (Streamlit) */
@@ -251,6 +283,11 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "pinecone_index" not in st.session_state:
     st.session_state.pinecone_index = None
+if "pending_prompt" not in st.session_state:
+    st.session_state.pending_prompt = None
+if "chat_prompt" not in st.session_state:
+    # Used as the widget key for st.chat_input so we can prefill from example questions.
+    st.session_state.chat_prompt = ""
 
 def init_pinecone():
     """Initialize Pinecone connection."""
@@ -439,20 +476,24 @@ def main():
                         </div>
                         """, unsafe_allow_html=True)
     
-    # Chat input
-    if prompt := st.chat_input("Ask a question about the Running Floor II installation..."):
+    def handle_prompt(prompt: str) -> None:
+        """Process a user prompt (from chat input or an example-question click)."""
+        prompt = (prompt or "").strip()
+        if not prompt:
+            return
+
         # Add user message
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
-        
+
         # Generate response
         with st.chat_message("assistant"):
             with st.spinner("Searching manual and generating response..."):
                 # Search knowledge base
                 matches = search_knowledge_base(prompt, index)
                 context, sources = build_context(matches)
-                
+
                 if not context:
                     response = """I couldn't find specific information about that in the Running Floor II 
                     Installation Manual. Could you rephrase your question, or ask about:
@@ -465,13 +506,13 @@ def main():
                 else:
                     # Get chat response
                     chat_history = [
-                        {"role": m["role"], "content": m["content"]} 
+                        {"role": m["role"], "content": m["content"]}
                         for m in st.session_state.messages[:-1]
                     ]
                     response = get_chat_response(prompt, context, chat_history)
-                
+
                 st.markdown(response)
-                
+
                 if sources:
                     with st.expander("📚 View Sources"):
                         for source in sources:
@@ -481,13 +522,26 @@ def main():
                                 <br><em>{source['text']}</em>
                             </div>
                             """, unsafe_allow_html=True)
-        
+
         # Save assistant message with sources
         st.session_state.messages.append({
-            "role": "assistant", 
+            "role": "assistant",
             "content": response,
             "sources": sources
         })
+
+        # Clear the draft in the input after sending
+        st.session_state.chat_prompt = ""
+
+    # If an example question was clicked, treat it like a submitted prompt.
+    if st.session_state.pending_prompt:
+        pending = st.session_state.pending_prompt
+        st.session_state.pending_prompt = None
+        handle_prompt(pending)
+
+    # Chat input (keyed so we can prefill from example questions)
+    if prompt := st.chat_input("Ask a question about the Running Floor II installation...", key="chat_prompt"):
+        handle_prompt(prompt)
 
 # Example questions section
 def show_example_questions():
@@ -505,7 +559,10 @@ def show_example_questions():
     for i, example in enumerate(examples):
         with cols[i % 2]:
             if st.button(f"❓ {example}", key=f"example_{i}", type="secondary"):
-                st.session_state.example_question = example
+                # Prefill the question box and immediately ask it.
+                st.session_state.chat_prompt = example
+                st.session_state.pending_prompt = example
+                st.rerun()
 
 if __name__ == "__main__":
     main()

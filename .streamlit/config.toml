@@ -1,0 +1,10 @@
+[theme]
+# Force consistent light rendering across browsers (Chrome can differ from Firefox when in auto/dark mode)
+base = "light"
+primaryColor = "#00395D"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F3F8FB"
+textColor = "#2E2E2E"
+font = "sans serif"
+
+
