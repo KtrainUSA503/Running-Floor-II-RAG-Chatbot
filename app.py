@@ -172,42 +172,52 @@ st.markdown("""
         border-color: var(--keith-blue);
     }
 
-    /* Chat input (fix Streamlit's default dark "footer" look) */
+    /* Chat input (Streamlit can render a dark fixed bottom container; override it hard) */
+    footer { background: var(--keith-bg) !important; }
+    .stChatFloatingInputContainer,
+    .stChatInputContainer,
     [data-testid="stChatInput"] {
-        background: transparent;
+        background: var(--keith-bg) !important;
     }
-    /* The fixed bottom container */
+    /* Remove any dark overlays/gradients behind the input */
+    .stChatFloatingInputContainer::before,
+    .stChatFloatingInputContainer::after {
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+    /* The fixed bottom container + spacing */
+    .stChatFloatingInputContainer,
+    .stChatInputContainer,
     [data-testid="stChatInput"] > div {
-        background: var(--keith-bg);
-        border-top: 1px solid var(--keith-border);
-        box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.08);
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
+        border-top: 1px solid var(--keith-border) !important;
+        box-shadow: 0 -10px 26px rgba(0, 0, 0, 0.08) !important;
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
     }
     [data-testid="stChatInput"] textarea {
-        background: var(--keith-bg);
-        color: var(--keith-text);
-        border-radius: 14px;
-        border: 1px solid var(--keith-border);
+        background: var(--keith-bg) !important;
+        color: var(--keith-text) !important;
+        border-radius: 14px !important;
+        border: 1px solid var(--keith-border) !important;
     }
     [data-testid="stChatInput"] textarea::placeholder {
-        color: var(--keith-muted);
-        opacity: 1;
+        color: var(--keith-muted) !important;
+        opacity: 1 !important;
     }
     [data-testid="stChatInput"] textarea:focus {
-        box-shadow: 0 0 0 4px var(--keith-focus);
-        border-color: var(--keith-blue);
+        box-shadow: 0 0 0 4px var(--keith-focus) !important;
+        border-color: var(--keith-blue) !important;
     }
     /* Send button */
     [data-testid="stChatInput"] button {
-        border-radius: var(--keith-radius-pill);
-        border: 1px solid var(--keith-border);
-        background: var(--keith-navy);
-        color: white;
+        border-radius: var(--keith-radius-pill) !important;
+        border: 1px solid var(--keith-border) !important;
+        background: var(--keith-navy) !important;
+        color: white !important;
     }
     [data-testid="stChatInput"] button:hover {
-        background: var(--keith-blue);
-        border-color: var(--keith-blue);
+        background: var(--keith-blue) !important;
+        border-color: var(--keith-blue) !important;
     }
 </style>
 """, unsafe_allow_html=True)
